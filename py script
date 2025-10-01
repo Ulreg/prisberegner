@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+
+def beregn_tilbud(antal_emblemer, antal_magneter):
+    # Pris-trin for emblemer
+    if antal_emblemer >= 100:
+        pris_emblem = 31
+    elif antal_emblemer >= 50:
+        pris_emblem = 33
+    else:
+        pris_emblem = 35
+
+    # Pris-trin for magneter
+    if antal_magneter >= 100:
+        pris_magnet = 21
+    elif antal_magneter >= 50:
+        pris_magnet = 23
+    else:
+        pris_magnet = 25
+
+    # Butikkens salgspriser til kunder (faste)
+    butik_emblem = 50
+    butik_magnet = 45
+
+    # Beregninger
+    indkoeb = (antal_emblemer * pris_emblem) + (antal_magneter * pris_magnet)
+    salg = (antal_emblemer * butik_emblem) + (antal_magneter * butik_magnet)
+    fortjeneste = salg - indkoeb
+    roi = (fortjeneste / indkoeb * 100) if indkoeb > 0 else 0
+
+    return indkoeb, salg, fortjeneste, roi
+
+
+def main():
+    print("Velkommen til beregneren for souvenirs fra TURISTFÆLDEN")
+    print("Her kan du beregne tilbud med emblemer og magneter.")
+    
+    # Spørg altid efter begge typer
+    antal_emblemer = int(input("Hvor mange emblemer vil du bestille? "))
+    antal_magneter = int(input("Hvor mange magneter vil du bestille? "))
+
+    indkoeb, salg, fortjeneste, roi = beregn_tilbud(antal_emblemer, antal_magneter)
+
+    print("\n--- Resultat ---")
+    print(f"Antal emblemer: {antal_emblemer}")
+    print(f"Antal magneter: {antal_magneter}")
+    print(f"Butikkens indkøbspris: {indkoeb} kr.")
+    print(f"Butikkens salgspris: {salg} kr.")
+    print(f"Butikkens fortjeneste: {fortjeneste} kr.")
+    print(f"ROI: {roi:.1f} %")
+
+
+if __name__ == "__main__":
+    main()
+input('Press ENTER to exit')
