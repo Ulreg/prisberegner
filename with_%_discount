@@ -1,0 +1,124 @@
+#!/usr/bin/env python3
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+def beregn_tilbud(antal_emblemer, antal_magneter):
+    # Pris-trin for emblemer
+    if antal_emblemer >= 100:
+        pris_emblem = 31
+    elif antal_emblemer >= 50:
+        pris_emblem = 33
+    else:
+        pris_emblem = 35
+
+    # Pris-trin for magneter
+    if antal_magneter >= 100:
+        pris_magnet = 21
+    elif antal_magneter >= 50:
+        pris_magnet = 23
+    else:
+        pris_magnet = 25
+
+    # Butikkens faste salgspriser til kunder
+    butik_emblem = 50
+    butik_magnet = 45
+
+    # Beregninger
+    indkoeb = (antal_emblemer * pris_emblem) + (antal_magneter * pris_magnet)
+    salg = (antal_emblemer * butik_emblem) + (antal_magneter * butik_magnet)
+    fortjeneste = salg - indkoeb
+
+    # Normalpris (uden mængderabat): basispriser 35 / 25
+    normalpris = (antal_emblemer * 35) + (antal_magneter * 25)
+    rabat = normalpris - indkoeb
+    rabat_pct = (rabat / normalpris * 100) if normalpris > 0 else 0
+
+    roi = (fortjeneste / indkoeb * 100) if indkoeb > 0 else 0
+
+    return {
+        "indkoeb": indkoeb,
+        "salg": salg,
+        "fortjeneste": fortjeneste,
+        "roi": roi,
+        "pris_emblem": pris_emblem,
+        "pris_magnet": pris_magnet,
+        "normalpris": normalpris,
+        "rabat": rabat,
+        "rabat_pct": rabat_pct
+    }
+
+def fmt(n):
+    """Format number uden decimaler"""
+    try:
+        return f"{int(round(n)):,}".replace(",", ".")
+    except Exception:
+        return str(n)
+
+def beregn():
+    try:
+        # Håndter tomt input som 0 og tjek for negative værdier
+        raw_em = entry_emblemer.get().strip()
+        raw_mg = entry_magneter.get().strip()
+        antal_emblemer = int(raw_em) if raw_em != "" else 0
+        antal_magneter = int(raw_mg) if raw_mg != "" else 0
+
+        if antal_emblemer < 0 or antal_magneter < 0:
+            messagebox.showerror("Fejl", "Antal kan ikke være negative.")
+            return
+
+        res = beregn_tilbud(antal_emblemer, antal_magneter)
+
+        # Byg resultattekst
+        tekst = (
+            f"Antal emblemer: {antal_emblemer}  (stykpris {res['pris_emblem']} kr.)\n"
+            f"Antal magneter: {antal_magneter}  (stykpris {res['pris_magnet']} kr.)\n\n"
+            f"Normalpris (uden rabat): {fmt(res['normalpris'])} kr.\n"
+            f"Rabat: {fmt(res['rabat'])} kr. ({res['rabat_pct']:.1f} %)\n\n"
+            f"Butikkens indkøbspris: {fmt(res['indkoeb'])} kr.\n"
+            f"Butikkens salgspris: {fmt(res['salg'])} kr.\n"
+            f"Butikkens fortjeneste: {fmt(res['fortjeneste'])} kr.\n"
+            f"ROI: {res['roi']:.1f} %"
+        )
+
+        resultat_text.set(tekst)
+
+    except ValueError:
+        messagebox.showerror("Fejl", "Indtast venligst heltal for antal (fx 24).")
+    except Exception as e:
+        messagebox.showerror("Fejl", f"Der opstod en uventet fejl:\n{e}")
+
+# ---------- GUI opsætning ----------
+root = tk.Tk()
+root.title("Souvenir Beregner – TURISTFÆLDEN")
+root.geometry("480x360")
+
+frame = ttk.Frame(root, padding="15")
+frame.grid(row=0, column=0, sticky="nsew")
+
+# Inputfelter
+ttk.Label(frame, text="Antal emblemer:").grid(row=0, column=0, sticky="w", pady=5)
+entry_emblemer = ttk.Entry(frame, width=12)
+entry_emblemer.grid(row=0, column=1, pady=5)
+entry_emblemer.insert(0, "24")  # eksempelværdi
+
+ttk.Label(frame, text="Antal magneter:").grid(row=1, column=0, sticky="w", pady=5)
+entry_magneter = ttk.Entry(frame, width=12)
+entry_magneter.grid(row=1, column=1, pady=5)
+entry_magneter.insert(0, "18")  # eksempelværdi
+
+# Beregn knap
+btn_beregn = ttk.Button(frame, text="Beregn", command=beregn)
+btn_beregn.grid(row=2, column=0, columnspan=2, pady=10)
+
+# Resultatfelt (multi-line Label via StringVar)
+resultat_text = tk.StringVar()
+label_resultat = ttk.Label(frame, textvariable=resultat_text, justify="left", padding="5", anchor="w")
+label_resultat.grid(row=3, column=0, columnspan=2, sticky="w")
+
+# Gør ruden skalerbar pænt
+root.columnconfigure(0, weight=1)
+root.rowconfigure(0, weight=1)
+frame.columnconfigure(1, weight=1)
+
+# Start GUI
+root.mainloop()
